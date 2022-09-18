@@ -4,7 +4,7 @@ export const Root = () => {
   return (
     <>
       <header id="header">
-        <h1>LITReview</h1>
+        <h1>BookReview</h1>
       </header>
       <Outlet />
     </>
