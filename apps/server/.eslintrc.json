@@ -14,5 +14,6 @@
       "files": ["*.js", "*.jsx"],
       "rules": {}
     }
-  ]
+  ],
+  "rules": { "no-useless-catch": "off" }
 }
