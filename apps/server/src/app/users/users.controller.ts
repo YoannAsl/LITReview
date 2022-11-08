@@ -6,39 +6,50 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
+import { UserEntity } from './models/user.entity';
+import { Observable } from 'rxjs';
+import { JwtGuard } from './../auth/guard/jwt.guard';
+import { FollowUserDto } from './dto/follow-user.dto';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<CreateUserDto & User> {
-    return this.usersService.create(createUserDto);
-  }
-
+  @UseGuards(JwtGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
-    console.log(id);
     return this.usersService.findOne(id);
   }
 
+  @UseGuards(JwtGuard)
   @Get()
   findAll() {
+    console.log(this.usersService.findAll());
     return this.usersService.findAll();
   }
 
+  @UseGuards(JwtGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(id, updateUserDto);
   }
 
+  @UseGuards(JwtGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
+  }
+
+  @UseGuards(JwtGuard)
+  @Post('/follow')
+  followUser(@Body() followUserDto: FollowUserDto) {
+    return this.usersService.followUser(
+      followUserDto.userId,
+      followUserDto.userToFollowId
+    );
   }
 }

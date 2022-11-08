@@ -1,29 +1,24 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { DataSource, Repository } from 'typeorm';
-import { User } from './entities/user.entity';
+import { UserEntity } from './models/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { from, Observable } from 'rxjs';
+import { UserFollows } from './models/userFollows.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     private dataSource: DataSource,
-    @InjectRepository(User) private usersRepository: Repository<User>
+    @InjectRepository(UserEntity)
+    private usersRepository: Repository<UserEntity>,
+    @InjectRepository(UserFollows)
+    private userFollowsRepository: Repository<UserFollows>
   ) {}
 
-  create(createUserDto: CreateUserDto): Promise<CreateUserDto & User> {
+  findAll(): Observable<UserEntity[]> {
     try {
-      const newUser = this.usersRepository.save(createUserDto);
-      return newUser;
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  findAll(): Promise<User[]> {
-    try {
-      return this.usersRepository.find();
+      return from(this.usersRepository.find());
     } catch (err) {
       console.error(err);
     }
@@ -61,6 +56,21 @@ export class UsersService {
     try {
       await this.usersRepository.delete(id);
       return { message: 'Deleted user' };
+    } catch (err) {
+      throw err;
+    }
+  }
+
+  async followUser(userId: string, userToFollowId: string) {
+    try {
+      const user = await this.findOne(userId);
+      const userToFollow = await this.findOne(userToFollowId);
+      console.log(user, userToFollow);
+      const userFollows = await this.userFollowsRepository.save({
+        user,
+        followedUser: userToFollow,
+      });
+      return userFollows;
     } catch (err) {
       throw err;
     }

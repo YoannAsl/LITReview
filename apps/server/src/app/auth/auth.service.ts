@@ -30,6 +30,7 @@ export class AuthService {
 
       return {
         message: 'Successfully created user',
+        userId: user.id,
         token: await this.signToken(user.id, user.userName),
       };
     } catch (error) {
@@ -49,6 +50,7 @@ export class AuthService {
 
       return {
         message: 'Successfully connected user',
+        userId: user.id,
         token: await this.signToken(user.id, user.userName),
       };
     } catch (err) {
